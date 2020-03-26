@@ -1,4 +1,4 @@
 # presentasi-threejs-yamabuki
 presentasi-threejs-yamabuki created by GitHub Classroom
 
-Bekerja degan Tekstur
+Bekerja dengan Tekstur
