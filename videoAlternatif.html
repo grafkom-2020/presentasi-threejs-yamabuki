@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Video Texture</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+            <!-- <video  id="video"  style="position: absolute; left: 15px; top: 75px;"  src="img/BDO.mp4"  controls="true" autoplay="true"> </video> -->
+            <video id="video" style="position: absolute; left: 15px; top: 75px;" width="320" height="240" loop>
+                  <source src="img/coffin.mp4" type="video/mp4">
+                  <source src="img/coffin.ogg" type="video/ogg">
+                Your browser does not support the video tag.
+                </video>
+            <script src="js/three.js"></script>
+            <script src="js/dat.gui.min.js"></script>
+		<script>
+            // Our Javascript will go here.
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            var video = document.getElementById( 'video' );
+
+            
+            // var texture = new THREE.VideoTexture( video );
+            var texture = new THREE.Texture(video);
+            texture.minFilter = THREE.LinearFilter;
+            texture.magFilter = THREE.LinearFilter;
+            texture.format = THREE.RGBFormat;
+            texture.generateMipmaps = false;
+            // texture.minFilter = THREE.LinearFilter;
+            // texture.magFilter = THREE.LinearFilter;
+            // texture.format = THREE.RGBFormat;
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+            
+            var geometry = new THREE.BoxGeometry();
+            var loader = new THREE.TextureLoader();
+
+            // var texture = THREE.ImageUtils.loadTexture("img/wall.jpg")
+            // var material = new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } );
+            var material = new THREE.MeshBasicMaterial( { map: texture } );
+            var cube = new THREE.Mesh( geometry, material );
+            scene.add( cube );
+
+            camera.position.z = 3;
+
+            var play, pause;
+            var zPos;
+            var guiControls = new function()
+            {
+                  this.play = function(){ video.play(); };
+                  this.pause = function(){ video.pause(); };
+                  this.zPos = 0.01;
+            }
+
+            var datGUI = new dat.GUI();
+            datGUI.add(guiControls, 'play');
+            datGUI.add(guiControls, 'pause');
+            datGUI.add(guiControls, 'zPos',-1.0,1.0);
+            
+            // document.addEventListener('click', onMouseClick, false);
+            // function onMouseClick(event)
+            // {
+            //       video.play();
+            // }
+
+            window.addEventListener('resize', function()
+            {
+                  var w = window.innerWidth;
+                  var h = window.innerHeight;
+                  renderer.setSize(w,h);
+                  camera.aspect = w / h;
+                  camera.updateProjectionMatrix();
+            });
+
+
+            var temp = camera.position.z;
+            function animate() 
+            {
+                  requestAnimationFrame( animate );
+
+                  cube.rotation.x += 0.01;
+                  cube.rotation.y += 0.01;
+
+                if (video.readyState === video.HAVE_ENOUGH_DATA) {
+                if (texture) texture.needsUpdate = true;
+                }
+                  camera.position.z = temp + guiControls.zPos;
+            
+	            renderer.render( scene, camera );
+            }
+            animate();
+		</script>
+	</body>
+</html>

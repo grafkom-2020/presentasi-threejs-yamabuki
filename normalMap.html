@@ -1,0 +1,164 @@
+<!DOCTYPE html>
+<html>
+	<head>
+		<meta charset="utf-8">
+		<title>Bump Map</title>
+		<style>
+			body { margin: 0; }
+			canvas { display: block; }
+		</style>
+	</head>
+	<body>
+            <script src="js/three.js"></script>
+            <script src="js/dat.gui.min.js"></script>
+		<script>
+            // Our Javascript will go here.
+            var scene = new THREE.Scene();
+            var camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.1, 1000 );
+
+            var renderer = new THREE.WebGLRenderer();
+            renderer.setSize( window.innerWidth, window.innerHeight );
+            document.body.appendChild( renderer.domElement );
+            
+            var geometry = new THREE.BoxGeometry();
+            var loader = new THREE.TextureLoader();
+
+            
+
+            // var texture = THREE.ImageUtils.loadTexture("img/wall.jpg")
+            // var material = new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } );
+            // var material = new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } );
+            // var material = 
+            // [
+            //       new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } ),
+            //       new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } ),
+            //       new THREE.MeshBasicMaterial( { map: texture } ),
+            //       new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } ),
+            //       new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } ),
+            //       new THREE.MeshBasicMaterial( { map: loader.load('img/wall.jpg') } ),
+            // ]
+            function createMesh(g, img, norm) 
+            {
+                var texture = loader.load("img/" + img);
+                var mat = new THREE.MeshPhongMaterial();
+                mat.map = texture;
+
+                var norm = loader.load("img/" + norm);
+                mat.normalMap = norm;
+
+                var mesh = new THREE.Mesh(g, mat);
+                return mesh;
+            }
+            // var cube = new THREE.Mesh( geometry, material );
+            
+            //buat plane (meja)
+            var plane = createMesh(new THREE.BoxBufferGeometry(200, 100, 0.1), "WoodFine26_COL_3K.jpg", "WoodFine26_NRM_3K.jpg");
+            plane.material.color.setHex(0x3c3c3c);
+            plane.position.y = -7.5;
+            plane.rotation.x = -0.5 * Math.PI;
+            scene.add(plane);
+
+            // buat cube sebelah kiri (cube bump map)
+            var cube = createMesh(new THREE.BoxGeometry(15,15,15), "plaster.jpg", "plaster-normal.jpg");
+            cube.position.x = -12;
+            scene.add( cube );
+
+            //buat cube sebelah kanan (cube tanpa bump map)
+            var material2 = new THREE.MeshPhongMaterial( { map: loader.load('img/plaster.jpg') } );
+            var cube2 = new THREE.Mesh( new THREE.BoxGeometry(15,15,15) , material2 );
+            cube2.position.x = 12;
+            scene.add(cube2)
+
+            //buat lampu bola keliling
+            var lampuMesh = new THREE.Mesh(new THREE.SphereGeometry(0.2), new THREE.MeshBasicMaterial({color: 0xac6c25}));
+            lampuMesh.castShadow = true;
+            lampuMesh.position = new THREE.Vector3(3,3,3);
+            scene.add(lampuMesh);
+
+            
+            var ambiLight = new THREE.AmbientLight(0x242424);
+            scene.add(ambiLight);
+
+            var light = new THREE.SpotLight();
+            light.position.set(0, 30, 30);
+            light.intensity = 1.2;
+            scene.add(light);
+
+            var pLight = new THREE.PointLight("#ff5808");
+            scene.add(pLight);
+
+            camera.position.z = 28;
+
+            var isRotating = false;
+            var guiControls = new function()
+            {
+                this.isRotating = false;
+                this.normalScale = 1.0;
+
+                this.scaleNormal = function(scale)
+                {
+                    cube.material.normalScale.set(scale, scale);
+                }
+            }
+
+            var datGUI = new dat.GUI();
+            datGUI.add(guiControls, 'isRotating');
+            datGUI.add(guiControls, 'normalScale', -2 , 2).onChange(guiControls.scaleNormal);
+            
+
+            window.addEventListener('resize', function()
+            {
+                  var w = window.innerWidth;
+                  var h = window.innerHeight;
+                  renderer.setSize(w,h);
+                  camera.aspect = w / h;
+                  camera.updateProjectionMatrix();
+            });
+
+
+            var temp = camera.position.z;
+            var invert = 1;
+            var phase = 0;
+            function animate() 
+            {
+                  requestAnimationFrame( animate );
+
+                if(guiControls.isRotating)
+                {
+                    cube.rotation.x += 0.01;
+                    cube.rotation.y += 0.01;
+
+                    cube2.rotation.x -= 0.01;
+                    cube2.rotation.y -= 0.01;
+                }
+
+                if (phase > 2 * Math.PI) 
+                {
+                    invert = invert * -1;
+                    phase -= 2 * Math.PI;
+                } 
+                else 
+                {
+                    phase += 0.03;
+                }
+
+                lampuMesh.position.z = +(21 * (Math.sin(phase)));
+                lampuMesh.position.x = -14 + (14 * (Math.cos(phase)));
+
+                if (invert < 0) 
+                {
+                    var pivot = 0;
+                    lampuMesh.position.x = (invert * (lampuMesh.position.x - pivot)) + pivot;
+                }
+
+
+                pLight.position.copy(lampuMesh.position);
+
+                //   camera.position.z = temp + guiControls.zPos;
+            
+	            renderer.render( scene, camera );
+            }
+            animate();
+		</script>
+	</body>
+</html>
