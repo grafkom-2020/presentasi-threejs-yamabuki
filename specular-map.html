@@ -4,11 +4,11 @@
 
 <head>
     <title>Example 10.06 - Specular map</title>
-    <script type="text/javascript" src="../libs/three.js"></script>
+    <script type="text/javascript" src="js/three.js"></script>
 
-    <script type="text/javascript" src="../libs/stats.js"></script>
-    <script type="text/javascript" src="../libs/dat.gui.js"></script>
-    <script type="text/javascript" src="../libs/OrbitControls.js"></script>
+    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/dat.gui.js"></script>
+    <script type="text/javascript" src="js/OrbitControls.js"></script>
     <style>
         body {
             /* set margin to 0 and overflow to hidden, to go fullscreen */
@@ -80,9 +80,9 @@
         render();
 
         function createMesh(geom) {
-            var planetTexture = THREE.ImageUtils.loadTexture("../assets/textures/planets/Earth.png");
-            var specularTexture = THREE.ImageUtils.loadTexture("../assets/textures/planets/EarthSpec.png");
-            var normalTexture = THREE.ImageUtils.loadTexture("../assets/textures/planets/EarthNormal.png");
+            var planetTexture = THREE.ImageUtils.loadTexture("img/Earth.png");
+            var specularTexture = THREE.ImageUtils.loadTexture("img/EarthSpec.png");
+            var normalTexture = THREE.ImageUtils.loadTexture("img/EarthNormal.png");
 
 
             var planetMaterial = new THREE.MeshPhongMaterial();

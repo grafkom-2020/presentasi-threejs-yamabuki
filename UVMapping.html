@@ -1,0 +1,152 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>UV-Map</title>
+    <script type="text/javascript" src="js/three.js"></script>
+    
+    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/dat.gui.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+        // create a scene, that will hold all our elements such as objects, cameras and lights.
+        var scene = new THREE.Scene();
+
+        // create a camera, which defines where we're looking at.
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        // create a render and set the size
+        var renderer;
+        var webGLRenderer = new THREE.WebGLRenderer();
+        webGLRenderer.setClearColor(new THREE.Color(0xffffff));
+        webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+        webGLRenderer.shadowMap.enabled = true;
+
+        renderer = webGLRenderer;
+
+        const geometry = new THREE.BoxGeometry(1,1,1);
+        const loader = new THREE.TextureLoader();
+        var haha = loader.load('img/a.jpg');
+        const material = new THREE.MeshBasicMaterial(
+            {
+                map: haha,
+            });
+        const cube = new THREE.Mesh(geometry,material);
+        scene.add(cube);
+
+        var bricks = [
+        new THREE.Vector2(0, .666),
+        new THREE.Vector2(.5, .666),
+        new THREE.Vector2(.5, 1),
+        new THREE.Vector2(0, 1),
+        ];
+        geometry.faceVertexUvs[0][0] = [ bricks[0], bricks[1], bricks[3] ];
+        geometry.faceVertexUvs[0][1] = [ bricks[1], bricks[2], bricks[3] ];
+
+
+        // position and point the camera to the center of the scene
+        camera.position.x = 3;
+        camera.position.y = 0;
+        camera.position.z = 1;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        // add subtle ambient lighting
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+
+
+        // add the output of the renderer to the html element
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        var incx = true;
+        var incz = true;
+        var incy = true;
+        var key = 5;
+        function rotate(){
+            if (incx){
+                camera.position.x+=0.15;
+                if (camera.position.x >= key){
+                    incx = false;
+                }
+            }
+            else{
+                camera.position.x-=0.15;
+                if (camera.position.x <= -key){
+                    incx = true;
+                }
+            }
+
+            if (incz){
+                camera.position.z+=0.15;
+                if (camera.position.z >= key){
+                    incz = false;
+                }
+            }
+            else{
+                camera.position.z-=0.15;
+                if (camera.position.z <= -key){
+                    incz = true;
+                }
+            }
+
+            if (incy){
+                camera.position.y+=0.15;
+                if (camera.position.y >= key){
+                    incy = false;
+                }
+            }
+            else{
+                camera.position.y-=0.15;
+                if (camera.position.y <= -key){
+                    incy = true;
+                }
+            }
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        }
+
+        var k=1;
+        
+        var freeze = false;
+        document.addEventListener('keydown', onKeydown, false);
+        function onKeydown(event) {
+            if (event.keyCode == 32) {
+                if (freeze == true) freeze = false;
+                else freeze = true;
+            }
+        }
+        render();
+
+        function render() {
+            k++;
+            if (k%2==0 && freeze){
+                rotate();
+                k=1;
+            }
+            
+            // stats.update();
+            // render using requestAnimationFrame
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+            
+        }
+
+</script>
+</body>
+</html>

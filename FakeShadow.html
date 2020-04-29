@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+
+<html>
+
+<head>
+    <title>FakeShadow-LightMap</title>
+    <script type="text/javascript" src="js/three.js"></script>
+    
+    <script type="text/javascript" src="js/stats.js"></script>
+    <script type="text/javascript" src="js/dat.gui.js"></script>
+    <style>
+        body {
+            /* set margin to 0 and overflow to hidden, to go fullscreen */
+            margin: 0;
+            overflow: hidden;
+        }
+    </style>
+</head>
+<body>
+
+<div id="Stats-output">
+</div>
+<!-- Div which will hold the Output -->
+<div id="WebGL-output">
+</div>
+
+<!-- Javascript code that runs our Three.js examples -->
+<script type="text/javascript">
+
+
+        var scene = new THREE.Scene();
+
+        var camera = new THREE.PerspectiveCamera(45, window.innerWidth / window.innerHeight, 0.1, 1000);
+
+        var renderer;
+        var webGLRenderer = new THREE.WebGLRenderer();
+        webGLRenderer.setClearColor(new THREE.Color(0xffffff));
+        webGLRenderer.setSize(window.innerWidth, window.innerHeight);
+        webGLRenderer.shadowMapEnabled = true;
+
+        renderer = webGLRenderer;
+        const loader = new THREE.TextureLoader();
+        
+        var lm = loader.load('img/lm-1.png');
+        var wood = loader.load('img/tanah.jpg');
+        var groundGeom = new THREE.PlaneGeometry(95, 95, 1, 1);
+        var groundMaterial = new THREE.MeshBasicMaterial(
+                {
+                    color: 0x777777,
+                    lightMap: lm,
+                    map: wood
+                });
+
+        groundGeom.faceVertexUvs[1] = groundGeom.faceVertexUvs[0];
+
+
+        var groundMesh = new THREE.Mesh(groundGeom, groundMaterial);
+
+        groundMesh.rotation.x = -Math.PI / 2;
+        groundMesh.position.y = 0;
+        scene.add(groundMesh);
+
+
+        var cubeGeometry = new THREE.BoxGeometry(12, 12, 12);
+        var cubeGeometry2 = new THREE.BoxGeometry(6, 6, 6);
+
+
+        var meshMaterial = new THREE.MeshBasicMaterial();
+        meshMaterial.map = loader.load('img/wood.jpg');
+
+
+        var cube = new THREE.Mesh(cubeGeometry, meshMaterial);
+        var cube2 = new THREE.Mesh(cubeGeometry2, meshMaterial);
+        cube.position.set(0.9, 6, -12);
+        cube2.position.set(-13.2, 3, -6);
+
+        scene.add(cube);
+        scene.add(cube2);
+
+        camera.position.x = 0;
+        camera.position.y = 20;
+        camera.position.z = 20;
+        camera.lookAt(new THREE.Vector3(0, 0, 0));
+
+        var ambientLight = new THREE.AmbientLight(0x0c0c0c);
+        scene.add(ambientLight);
+
+        document.getElementById("WebGL-output").appendChild(renderer.domElement);
+        var incx = true;
+        var incz = true;
+        
+        function rotate(){
+            if (incx){
+                camera.position.x++;
+                if (camera.position.x >= 40){
+                    incx = false;
+                }
+            }
+            else{
+                camera.position.x--;
+                if (camera.position.x <= -40){
+                    incx = true;
+                }
+            }
+
+            if (incz){
+                camera.position.z++;
+                if (camera.position.z >= 40){
+                    incz = false;
+                }
+            }
+            else{
+                camera.position.z--;
+                if (camera.position.z <= -40){
+                    incz = true;
+                }
+            }
+            camera.lookAt(new THREE.Vector3(0, 0, 0));
+        }
+        var k=1;
+        
+        var freeze = false;
+        document.addEventListener('keydown', onKeydown, false);
+        function onKeydown(event) {
+            if (event.keyCode == 32) {
+                if (freeze == true) freeze = false;
+                else freeze = true;
+            }
+        }
+        render();
+
+        function render() {
+            k++;
+            if (k%2==0 && freeze){
+                rotate();
+                k=1;
+            }
+            requestAnimationFrame(render);
+            renderer.render(scene, camera);
+            
+        }
+</script>
+</body>
+</html>
