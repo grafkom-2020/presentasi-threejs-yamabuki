@@ -21,10 +21,10 @@ function main() {
   const cubes = []; 
   const loader = new THREE.TextureLoader();
   //tex1
-  // const texture = loader.load('img/b.png');
-  // texture.minFilter = THREE.LinearMipMapLinearFilter;
-  // texture.magFilter = THREE.LinearFilter;
-  // const material = new THREE.MeshBasicMaterial({map: texture});
+  const texture = loader.load('img/b.png');
+  texture.minFilter = THREE.LinearMipMapLinearFilter;
+  texture.magFilter = THREE.LinearFilter;
+  const material = new THREE.MeshBasicMaterial({map: texture});
   //tex2
     // const materials =[
     //     new THREE.MeshBasicMaterial({map: loader.load('img/1.png'),side : THREE.DoubleSide}),
@@ -35,10 +35,7 @@ function main() {
     //     new THREE.MeshBasicMaterial({map: loader.load('img/6.png'),side : THREE.DoubleSide}),
     // ];
 
-    var loader2 = new THREE.CubeTextureLoader();
-    loader2.setPath('img/');
-    var texCube = loader2.load(['1.png','2.png','3.png','4.png','5.png','a.png']);
-    var material = new THREE.MeshBasicMaterial({envMap: texCube, side : THREE.DoubleSide});
+
     const cube = new THREE.Mesh(geometry, material);
   //const cube = new THREE.Mesh(geometry, materials);
   scene.add(cube);
